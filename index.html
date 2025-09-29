@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athlete Intelligence Dashboard - SugarWOD Prototype</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tab-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .tab-nav {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #718096;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            padding: 2rem;
+            min-height: 600px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .health-score {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .insights-panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .insights-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .insight-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .insight-item:last-child {
+            border-bottom: none;
+        }
+
+        .insight-icon {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 1rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .insight-strength { background: #48bb78; }
+        .insight-energy { background: #ed8936; }
+        .insight-recovery { background: #667eea; }
+        .insight-alert { background: #f56565; }
+        .insight-programming { background: #805ad5; }
+
+        .insight-content h4 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .insight-content p {
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation {
+            background: #f7fafc;
+            padding: 0.75rem;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .athlete-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .athlete-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .athlete-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .athlete-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .athlete-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-green { background: #48bb78; }
+        .status-yellow { background: #ed8936; }
+        .status-red { background: #f56565; }
+
+        .athlete-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .action-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s ease;
+        }
+
+        .action-button:hover {
+            background: #5a67d8;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .survey-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .survey-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .survey-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .survey-section h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .rating-scale {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .rating-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0.5rem;
+        }
+
+        .rating-option input[type="radio"] {
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-option label {
+            font-size: 0.8rem;
+            text-align: center;
+            color: #718096;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 5px;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s ease;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .mobile-responsive {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .quick-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .athlete-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab-nav {
+                flex-direction: column;
+            }
+            
+            .rating-scale {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .rating-option {
+                flex-direction: row;
+                justify-content: space-between;
+                margin: 0.25rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧠 Athlete Intelligence Dashboard</h1>
+        <p>AI-powered insights for coaches and athletes - SugarWOD Prototype</p>
+    </div>
+
+    <div class="container">
+        <div class="tab-container">
+            <div class="tab-nav">
+                <button class="tab-button active" onclick="switchTab('athlete', this)">Athlete Dashboard</button>
+                <button class="tab-button" onclick="switchTab('coach', this)">Coach Dashboard</button>
+            </div>
+
+            <!-- Athlete Dashboard Tab -->
+            <div id="athlete-tab" class="tab-pane active">
+                <div class="tab-content">
+                    <div class="dashboard-header">
+                        <div>
+                            <h2>👤 Sarah Kim's Performance Dashboard</h2>
+                            <p style="color: #718096;">CrossFit athlete • 18 months experience</p>
+                        </div>
+                        <div class="health-score">
+                            <span style="margin-right: 0.5rem;">⚡</span>
+                            Health Score: 85/100
+                        </div>
+                    </div>
+
+                    <div class="quick-stats">
+                        <div class="stat-card">
+                            <div class="stat-number">4/5</div>
+                            <div class="stat-label">Workouts This Week ✓</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">PRs This Month 🎯</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Current Streak Days</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">82%</div>
+                            <div class="stat-label">Sleep Quality 😴</div>
+                        </div>
+                    </div>
+
+                    <div class="insights-panel">
+                        <div class="insights-header">
+                            🧠 Your AI-Powered Performance Insights
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-icon insight-strength">💪</span>
+                            <div class="insight-content">
+                                <h4>Strength Focus</h4>
+                                <p>Your squat has improved 15% this month! Your best performances happen on Tuesdays after mobility work.</p>
+                                <div class="recommendation">→ Next goal: Add 10lbs to your back squat by month-end</div>
+                            </div>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-icon insight-energy">⚡</span>
+                            <div class="insight-content">
+                                <h4>Energy Optimization</h4>
+                                <p>You perform 20% better in evening classes (5-7 PM). Your HRV today suggests moderate intensity is optimal.</p>
+                                <div class="recommendation">→ Recommendation: Scale today's workout to 80% intensity</div>
+                            </div>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-icon insight-recovery">😴</span>
+                            <div class="insight-content">
+                                <h4>Recovery Status</h4>
+                                <p>Your sleep quality dropped 15% this week. This typically impacts your conditioning workouts more than strength.</p>
+                                <div class="recommendation">→ Try: Earlier bedtime tonight for tomorrow's WOD</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insights-panel">
+                        <div class="insights-header">
+                            🎯 Goals Progress
+                        </div>
+                        <div class="insight-item">
+                            <h4>Bodyweight Goal: 165 lbs</h4>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 80%;"></div>
+                            </div>
+                            <p>Current: 170 lbs • On track to achieve by: March 15, 2025</p>
+                        </div>
+                        <div class="insight-item">
+                            <h4>Back Squat PR: 225 lbs</h4>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 100%;"></div>
+                            </div>
+                            <p><strong>Achieved! 🎉</strong> Next challenge: 250 lbs by June 2025?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coach Dashboard Tab -->
+            <div id="coach-tab" class="tab-pane">
+                <div class="tab-content">
+                    <div class="dashboard-header">
+                        <div>
+                            <h2>👨‍🏫 Coach Dashboard - Iron Valley CrossFit</h2>
+                            <p style="color: #718096;">45 Athletes • 3 Classes Today</p>
+                        </div>
+                        <div class="health-score">
+                            <span style="margin-right: 0.5rem;">🚨</span>
+                            Alerts: 3
+                        </div>
+                    </div>
+
+                    <div class="insights-panel">
+                        <div class="insights-header">
+                            🚨 Athletes Needing Attention
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-icon insight-alert">🔴</span>
+                            <div class="insight-content">
+                                <h4>Mike Chen - Attendance dropped 60%</h4>
+                                <p>Was attending 4x/week, now 0 workouts in 8 days. Last workout: 8 days ago</p>
+                                <div class="recommendation">→ Suggest: Personal check-in call today</div>
+                            </div>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-icon insight-energy">🟡</span>
+                            <div class="insight-content">
+                                <h4>Sarah Kim - Performance plateau detected</h4>
+                                <p>No PRs in 6 weeks despite consistent attendance. Technical limitations observed.</p>
+                                <div class="recommendation">→ Suggest: Movement quality focus session</div>
+                            </div>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-icon insight-recovery">🟡</span>
+                            <div class="insight-content">
+                                <h4>Tom Rodriguez - Overreaching indicators</h4>
+                                <p>HRV declining 15% over 2 weeks, fatigue reports increasing</p>
+                                <div class="recommendation">→ Suggest: Deload week with active recovery</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="athlete-grid">
+                        <div class="athlete-card">
+                            <div class="athlete-header">
+                                <div class="athlete-name">Sarah Kim</div>
+                                <span class="status-indicator status-yellow"></span>
+                            </div>
+                            <div class="athlete-stats">
+                                <span>Last WOD: 1 day</span>
+                                <span>This Week: 3/4</span>
+                                <span>Trend: ↗️ Plateau</span>
+                            </div>
+                            <button class="action-button">View Profile</button>
+                        </div>
+
+                        <div class="athlete-card">
+                            <div class="athlete-header">
+                                <div class="athlete-name">Mike Chen</div>
+                                <span class="status-indicator status-red"></span>
+                            </div>
+                            <div class="athlete-stats">
+                                <span>Last WOD: 8 days</span>
+                                <span>This Week: 0/4</span>
+                                <span>Trend: ↘️ Risk</span>
+                            </div>
+                            <button class="action-button">Send Message</button>
+                        </div>
+
+                        <div class="athlete-card">
+                            <div class="athlete-header">
+                                <div class="athlete-name">Lisa Wong</div>
+                                <span class="status-indicator status-green"></span>
+                            </div>
+                            <div class="athlete-stats">
+                                <span>Last WOD: Today</span>
+                                <span>This Week: 5/4</span>
+                                <span>Trend: ↗️ Strong</span>
+                            </div>
+                            <button class="action-button">Celebrate PRs</button>
+                        </div>
+
+                        <div class="athlete-card">
+                            <div class="athlete-header">
+                                <div class="athlete-name">Tom Rodriguez</div>
+                                <span class="status-indicator status-yellow"></span>
+                            </div>
+                            <div class="athlete-stats">
+                                <span>Last WOD: Today</span>
+                                <span>This Week: 6/4</span>
+                                <span>Trend: ⚠️ Overreach</span>
+                            </div>
+                            <button class="action-button">Plan Deload</button>
+                        </div>
+                    </div>
+
+                    <div class="insights-panel">
+                        <div class="insights-header">
+                            💡 Coaching Insights & Recommendations
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-icon insight-programming">📈</span>
+                            <div class="insight-content">
+                                <h4>Programming Insights</h4>
+                                <p>Your athletes struggle most with overhead movements (45% completion rate). Best performing workout: Strength + short MetCon.</p>
+                                <div class="recommendation">→ Add 2x/week overhead mobility work to class warm-ups</div>
+                            </div>
+                        </div>
+                        <div class="insight-item">
+                            <span class="insight-icon insight-strength">🎯</span>
+                            <div class="insight-content">
+                                <h4>Class Composition Optimization</h4>
+                                <p>Tuesday 6 PM class has optimal skill distribution. Peak attendance: Tuesday 6 PM, Thursday 7 AM</p>
+                                <div class="recommendation">→ Schedule complex movements during high-skill time slots</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Survey Tab Removed - Direct to Google Form -->
+        </div>
+
+        <!-- Feedback Call-to-Action -->
+        <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #667eea, #764ba2); margin-top: 2rem; border-radius: 10px;">
+            <h3 style="color: white; margin-bottom: 1rem;">📝 Ready to Share Your Feedback?</h3>
+            <p style="color: white; margin-bottom: 1.5rem; opacity: 0.9;">
+                Help us validate this AI-powered dashboard concept. Your input directly influences our 2025 product roadmap.
+            </p>
+            <button onclick="openFeedbackSurvey()" style="background: white; color: #667eea; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: transform 0.2s ease;">
+                Complete Feedback Survey
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName, buttonElement) {
+            // Hide all tab panes
+            const panes = document.querySelectorAll('.tab-pane');
+            panes.forEach(pane => pane.classList.remove('active'));
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // Show selected tab and activate button
+            document.getElementById(tabName + '-tab').classList.add('active');
+            buttonElement.classList.add('active');
+        }
+
+        // Function to open feedback survey
+        function openFeedbackSurvey() {
+            // REPLACE THIS URL WITH YOUR ACTUAL GOOGLE FORM URL
+            const googleFormUrl = 'https://forms.google.com/your-form-id-here';
+            
+            alert(`Thank you for exploring the Athlete Intelligence Dashboard!
+
+🎯 This prototype demonstrates how AI could help gym owners and coaches:
+• Identify at-risk members before they churn
+• Get personalized coaching recommendations 
+• Optimize programming based on member data
+• Track performance trends and goal achievement
+
+Your feedback in the survey will directly influence whether we build this feature and how we prioritize it in our 2025 roadmap.
+
+The survey takes about 5-7 minutes and helps us reach our 80% acceptance target.
+
+Opening survey now...`);
+            
+            window.open(googleFormUrl, '_blank');
+            
+            // Log the interaction for internal tracking
+            console.log('Feedback Survey Opened:', {
+                timestamp: new Date().toISOString(),
+                prototype_version: 'v1.0_simplified',
+                user_agent: navigator.userAgent
+            });
+        }
+
+        // Add mobile touch improvements
+        if ('ontouchstart' in window) {
+            document.body.classList.add('touch-device');
+            
+            // Add hover effect for mobile
+            document.querySelector('button[onclick="openFeedbackSurvey()"]').addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.95)';
+            });
+            
+            document.querySelector('button[onclick="openFeedbackSurvey()"]').addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+            });
+        }
+    </script>
+</body>
+</html>
